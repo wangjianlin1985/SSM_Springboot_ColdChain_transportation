@@ -1,0 +1,63 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.CarProductMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加冷藏车商品记录 -->
+	<insert id="addCarProduct" parameterType="carProduct">
+		insert into t_carProduct(productObj,carObj,productNum,productMemo) values 
+		(#{productObj.productId},#{carObj.carNo},#{productNum},#{productMemo})
+	</insert>
+
+	<!-- 按照查询条件分页查询冷藏车商品记录 -->
+	<select id="queryCarProduct" resultMap="carProductMap" >
+		select t_carProduct.* from t_carProduct,t_chillCar,t_product ${where} and t_carProduct.productObj = t_product.productId and t_carProduct.carObj = t_chillCar.carNo limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="carProductMap" type="carProduct">
+        <id property="id" column="id" />
+        <association property="productObj" column="productObj" select="com.chengxusheji.mapper.ProductMapper.getProduct" />
+        <association property="carObj" column="carObj" select="com.chengxusheji.mapper.ChillCarMapper.getChillCar" />
+    </resultMap>
+    
+    <!-- 按照查询条件分页查询冷藏车商品温度异常记录 -->
+	<select id="queryWarningCarProduct" resultMap="carProductMap" >
+		select t_carProduct.* from t_carProduct,t_chillCar,t_product ${where} and t_carProduct.productObj = t_product.productId and t_carProduct.carObj = t_chillCar.carNo and (t_chillCar.dqwd &lt; t_product.zdwd or t_chillCar.dqwd &gt; t_product.zgwd) limit #{startIndex},#{pageSize}
+	</select>
+	 
+    
+
+    <!-- 按照查询条件查询所有冷藏车商品记录 -->
+	<select id="queryCarProductList" resultMap="carProductMap" >
+		select t_carProduct.* from t_carProduct,t_chillCar,t_product ${where} and t_carProduct.productObj = t_product.productId and t_carProduct.carObj = t_chillCar.carNo
+	</select>
+
+    <!-- 按照查询条件的冷藏车商品记录数 -->
+	<select id="queryCarProductCount" resultType="int">
+		select count(*) from t_carProduct,t_chillCar,t_product ${where} and t_carProduct.productObj = t_product.productId and t_carProduct.carObj = t_chillCar.carNo
+	</select>
+	
+	
+	<!-- 按照查询条件的温度超标的冷藏车商品记录数 -->
+	<select id="queryWarningCarProductCount" resultType="int">
+		select count(*) from t_carProduct,t_chillCar,t_product ${where} and t_carProduct.productObj = t_product.productId and t_carProduct.carObj = t_chillCar.carNo and (t_chillCar.dqwd &lt; t_product.zdwd or t_chillCar.dqwd &gt; t_product.zgwd)
+	</select>
+
+	<!-- 根据主键查询某个冷藏车商品记录 -->
+	<select id="getCarProduct" parameterType="int" resultMap="carProductMap">
+		select * from t_carProduct where t_carProduct.id = #{id}
+	</select>
+
+	<!-- 更新冷藏车商品记录 -->
+	<update id="updateCarProduct" parameterType="carProduct">
+		update t_carProduct set productObj=#{productObj.productId},carObj=#{carObj.carNo},productNum=#{productNum},productMemo=#{productMemo} where id = #{id}
+	</update>
+
+	<!-- 删除冷藏车商品记录 -->
+	<delete id="deleteCarProduct" parameterType="int">
+		delete from t_carProduct where id=#{id}
+	</delete>
+
+</mapper>

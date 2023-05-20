@@ -1,0 +1,48 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ChillCarMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加冷藏车记录 -->
+	<insert id="addChillCar" parameterType="chillCar">
+		insert into t_chillCar(carNo,carType,pinpai,pl,carPhoto,carDesc,dqwd,carMemo) values 
+		(#{carNo},#{carType},#{pinpai},#{pl},#{carPhoto},#{carDesc},#{dqwd},#{carMemo})
+	</insert>
+
+	<!-- 按照查询条件分页查询冷藏车记录 -->
+	<select id="queryChillCar" resultMap="chillCarMap" >
+		select t_chillCar.* from t_chillCar ${where} limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="chillCarMap" type="chillCar">
+        <id property="carNo" column="carNo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有冷藏车记录 -->
+	<select id="queryChillCarList" resultMap="chillCarMap" >
+		select t_chillCar.* from t_chillCar ${where}
+	</select>
+
+    <!-- 按照查询条件的冷藏车记录数 -->
+	<select id="queryChillCarCount" resultType="int">
+		select count(*) from t_chillCar ${where}
+	</select>
+
+	<!-- 根据主键查询某个冷藏车记录 -->
+	<select id="getChillCar" parameterType="string" resultMap="chillCarMap">
+		select * from t_chillCar where t_chillCar.carNo = #{carNo}
+	</select>
+
+	<!-- 更新冷藏车记录 -->
+	<update id="updateChillCar" parameterType="chillCar">
+		update t_chillCar set carType=#{carType},pinpai=#{pinpai},pl=#{pl},carPhoto=#{carPhoto},carDesc=#{carDesc},dqwd=#{dqwd},carMemo=#{carMemo} where carNo = #{carNo}
+	</update>
+
+	<!-- 删除冷藏车记录 -->
+	<delete id="deleteChillCar" parameterType="string">
+		delete from t_chillCar where carNo=#{carNo}
+	</delete>
+
+</mapper>

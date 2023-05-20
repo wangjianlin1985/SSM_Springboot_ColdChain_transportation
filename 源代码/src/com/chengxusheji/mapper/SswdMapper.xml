@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.SswdMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加实时温度记录 -->
+	<insert id="addSswd" parameterType="sswd">
+		insert into t_sswd(carObj,cjwd,userObj,cjsj) values 
+		(#{carObj.carNo},#{cjwd},#{userObj.user_name},#{cjsj})
+	</insert>
+
+	<!-- 按照查询条件分页查询实时温度记录 -->
+	<select id="querySswd" resultMap="sswdMap" >
+		select t_sswd.* from t_sswd,t_chillCar,t_userInfo ${where} and t_sswd.carObj = t_chillCar.carNo and t_sswd.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="sswdMap" type="sswd">
+        <id property="sswdId" column="sswdId" />
+        <association property="carObj" column="carObj" select="com.chengxusheji.mapper.ChillCarMapper.getChillCar" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有实时温度记录 -->
+	<select id="querySswdList" resultMap="sswdMap" >
+		select t_sswd.* from t_sswd,t_chillCar,t_userInfo ${where} and t_sswd.carObj = t_chillCar.carNo and t_sswd.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的实时温度记录数 -->
+	<select id="querySswdCount" resultType="int">
+		select count(*) from t_sswd,t_chillCar,t_userInfo ${where} and t_sswd.carObj = t_chillCar.carNo and t_sswd.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个实时温度记录 -->
+	<select id="getSswd" parameterType="int" resultMap="sswdMap">
+		select * from t_sswd where t_sswd.sswdId = #{sswdId}
+	</select>
+
+	<!-- 更新实时温度记录 -->
+	<update id="updateSswd" parameterType="sswd">
+		update t_sswd set carObj=#{carObj.carNo},cjwd=#{cjwd},userObj=#{userObj.user_name},cjsj=#{cjsj} where sswdId = #{sswdId}
+	</update>
+
+	<!-- 删除实时温度记录 -->
+	<delete id="deleteSswd" parameterType="int">
+		delete from t_sswd where sswdId=#{sswdId}
+	</delete>
+
+</mapper>
